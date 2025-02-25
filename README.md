@@ -50,23 +50,7 @@ Approach: Medallion Architecture
 ![image](https://github.com/user-attachments/assets/0bbc85bd-7b5a-4f1e-8cdc-e89d82f29073)
 
 
-# Project Initialization
 
-**Naming Conventions**
- Using snake_case, with lowercase letters and underscores (_) to separate words.
 
-**Table Naming Conventions**
- 
-All names must start with the source system name, and table names must match their original names without renaming.
-
-(sourcesystem)_(entity)
-
-(sourcesystem): Name of the source system (e.g., crm, erp).
-
-(entity): Exact table name from the source system.
-
-Example: crm_customer_info → Customer information from the CRM system.
-
-**Creating Database and Schema**
 
 
