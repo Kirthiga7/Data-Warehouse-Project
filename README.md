@@ -11,6 +11,7 @@ It includes
 - Data Modeling
 
 # ETL Processing
+![image](https://github.com/user-attachments/assets/d5ed9044-4efa-471f-a73f-c02bc133ef2b)
 
 **Extract (E)** : Data is retrieved from various sources like databases
 - Method: Pull Extraction
@@ -18,7 +19,9 @@ It includes
 - Technique: File Parsing
 
 **Transform (T)** – Data is cleansed, formatted, and structured before loading
-It includes Data enrichment, Data integration, Derived column, Data normalization& /standardization, Business rules& logic and Data aggregation.
+
+It includes Data enrichment, Data integration, Derived column, Data normalization & standardization, Business rules& logic and Data aggregation.
+
 Data Cleansing include remove duplicates, data filtering, data type casting, handling missing data, invalid values and unwanted spaces.
 
 **Load (L)** – The transformed data is loaded into a data warehouse
@@ -27,8 +30,6 @@ Data Cleansing include remove duplicates, data filtering, data type casting, han
 - Slowly Changing Simensions(SCD) - SCD1-overwrite(updating the content of data warehouse)
 
 Between Source and Target We have multiple layers depend on building the data warehouse
-![image](https://github.com/user-attachments/assets/d5ed9044-4efa-471f-a73f-c02bc133ef2b)
 
+![image](https://github.com/user-attachments/assets/11554b8f-1949-414c-9ba6-b87a9d2581f8)
 
-
-![image](https://github.com/user-attachments/assets/3a0c5afe-e83a-4b94-a9db-54fb5311ea48)
