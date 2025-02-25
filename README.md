@@ -31,5 +31,15 @@ Data Cleansing include remove duplicates, data filtering, data type casting, han
 
 Between Source and Target We have multiple layers depend on building the data warehouse
 
-![image](https://github.com/user-attachments/assets/11554b8f-1949-414c-9ba6-b87a9d2581f8)
+# Data Architecture
 
+Data Architecture is the blueprint that defines how data is collected, stored, processed, and used within an organization.
+
+It ensures data is organized, secure, and accessible for analytics, decision-making, and operational processes.
+
+Type: Data Warehouse
+Approach: Medallion Architecture
+
+**Design the layers**
+
+![image](https://github.com/user-attachments/assets/9f1c6eca-3685-4853-92e6-8b27d01d01c8)
