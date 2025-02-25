@@ -10,14 +10,17 @@ It includes
 - Data Load
 - Data Modeling
 
-#ETL Processing
+# ETL Processing
+
 **Extract (E)** : Data is retrieved from various sources like databases
 - Method: Pull Extraction
 - Type: Full Extraction 
 - Technique: File Parsing
+
 **Transform (T)** – Data is cleansed, formatted, and structured before loading
 It includes Data enrichment, Data integration, Derived column, Data normalization& /standardization, Business rules& logic and Data aggregation.
 Data Cleansing include remove duplicates, data filtering, data type casting, handling missing data, invalid values and unwanted spaces.
+
 **Load (L)** – The transformed data is loaded into a data warehouse
 - Processing type: Batch processing
 - Load method: Full load - Truncate and Insert
