@@ -43,4 +43,11 @@ Approach: Medallion Architecture
 
 **Design the layers**
 
-![image](https://github.com/user-attachments/assets/9f1c6eca-3685-4853-92e6-8b27d01d01c8)
+![image](https://github.com/user-attachments/assets/9f1c6eca-3685-4853-92e6-8b27d01d01c8) 
+
+**Diagram of the Architecture**
+
+![image](https://github.com/user-attachments/assets/55162e36-9f80-4ddd-9e3a-cc3e03e3ea67)
+
+
+
