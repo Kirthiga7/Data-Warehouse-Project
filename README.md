@@ -234,6 +234,7 @@ CREATE TABLE silver.erp_loc_a101(
 **Clean crm_cust_info**
 
 A Primary Key must be unique and not NULL
+Remove Duplicates: Ensure omly one record per entity by identifying and retaining the most relevant row
 ```sql
 --Check for NULLs or Duplicates in Primary Key
 --Expectations: No Result
@@ -255,6 +256,7 @@ SELECT *,
 WHERE flag_last != 1;
 ```
 Check unwanted spaces in string values
+Remove unnecessary spaces to ensure data consistency, and uniformity across all records.
 ```sql
 --Check for unwanted spaces
 --Expectations: No Result
@@ -310,10 +312,10 @@ SELECT
 	CASE WHEN UPPER(TRIM(cst_marital_status)) = 'S' THEN 'Single'
 	     WHEN UPPER(TRIM(cst_marital_status)) = 'M' THEN 'Married'
 	     ELSE 'n/a'
-	END  cst_marital_status,
+	END  cst_marital_status, --Normalize marital status values to readable format
 	CASE WHEN UPPER(TRIM(cst_gndr)) = 'F' THEN 'Female'
 	     WHEN UPPER(TRIM(cst_gndr)) = 'M' THEN 'Male'
-	     ELSE 'n/a'
+	     ELSE 'n/a' --Normalize gender values to readable format
 	END cst_gndr,
 	cst_create_date
 	cst_create_date
@@ -322,8 +324,35 @@ FROM(
 		ROW_NUMBER() OVER(PARTITION BY cst_id ORDER BY cst_create_date DESC) as flag_last
 	FROM bronze.crm_cust_info
 	WHERE cst_id IS NOT NULL
-)WHERE flag_last = 1; 
+)WHERE flag_last = 1; --Select the most recent record per customer
 ```
+Quality Check of silver table
+
+Re-run the quality  check queries from bronze layer to verify the quality of data in the silver laye.
+```sql
+SELECT 
+	cst_id,
+	COUNT(*)
+FROM silver.crm_cust_info
+GROUP BY cst_id
+HAVING COUNT(*) > 1 OR cst_id IS NULL; --No Result
+
+SELECT cst_firstname
+FROM silver.crm_cust_info
+WHERE cst_firstname != TRIM(cst_firstname); --No Result
+
+SELECT 
+	DISTINCT cst_gndr
+FROM silver.crm_cust_info; --No Result
+
+SELECT * FROM silver.crm_cust_info
+```
+
+**Clean & Load crm_prd_info**
+
+
+
+
 
 
 
