@@ -79,7 +79,8 @@ CREATE SCHEMA SILVER;
 CREATE SCHEMA GOLD;
 ```
 # Bronze Layer
-![image](https://github.com/user-attachments/assets/ff53aaaf-3e29-416b-9544-9dfcdb0a71bf)
+![image](https://github.com/user-attachments/assets/bf4e2bd7-6c2d-42f4-bd3a-21cc51d0133c)
+
 
 **Create DDL for Tables**
 
@@ -147,6 +148,11 @@ CREATE TABLE bronze.erp_loc_a101(
 
 
 **Import data from CSV files to respective Table**
+
+**Data Flow**
+
+![image](https://github.com/user-attachments/assets/9bb6a3f9-1dbb-44db-a5e7-d2a28a631384)
+
 
 
 
