@@ -158,6 +158,137 @@ CREATE TABLE bronze.erp_loc_a101(
 
 **Explore and Understand Data**
 
+Exploring all columns in every table and relationship between these tables
+
+**INTEGRATION MODEL:**
+![image](https://github.com/user-attachments/assets/48132423-c0b4-4269-be05-af7aba3c090e)
+
+**Metadata Columns:**
+Extra Columns added by data engineers that do not orginate from the source data.
+
+Here I add create_date to track the record's load timestamp
+
+**Create DDL for Tables**
+
+```SQL
+DROP TABLE IF EXISTS silver.crm_cust_info;
+CREATE TABLE silver.crm_cust_info(
+	cst_id INT,
+	cst_key	VARCHAR(20),
+	cst_firstname VARCHAR(20),
+	cst_lastname VARCHAR(30),
+	cst_marital_status VARCHAR(20),
+	cst_gndr VARCHAR(20),
+	cst_create_date DATE,
+	dwh_create_date TIMESTAMP DEFAULT NOW()
+);
+DROP TABLE IF EXISTS silver.crm_prd_info;
+CREATE TABLE silver.crm_prd_info(
+	prd_id 	INT,
+	cat_id VARCHAR(50),
+	prd_key	VARCHAR(50),
+	prd_nm	VARCHAR(50),
+	prd_cost INT,
+	prd_line VARCHAR(20),
+	prd_start_dt DATE,
+	prd_end_dt DATE,
+	dwh_create_date TIMESTAMP DEFAULT NOW()
+);
+DROP TABLE IF EXISTS silver.crm_sales_details;
+CREATE TABLE silver.crm_sales_details(
+	sls_ord_num	VARCHAR(50),
+	sls_prd_key VARCHAR(50),
+	sls_cust_id	INT,
+	sls_order_dt DATE,
+	sls_ship_dt	DATE,
+	sls_due_dt DATE,
+	sls_sales INT,
+	sls_quantity INT,
+	sls_price INT,
+	dwh_create_date TIMESTAMP DEFAULT NOW()
+);
+
+DROP TABLE IF EXISTS silver.erp_cust_az12;
+CREATE TABLE silver.erp_cust_az12(
+	CID VARCHAR(50),
+	BDATE DATE,
+	GEN VARCHAR(10),
+	dwh_create_date TIMESTAMP DEFAULT NOW()
+);
+DROP TABLE IF EXISTS silver.erp_px_cat_g1v2;
+CREATE TABLE silver.erp_px_cat_g1v2(
+	id VARCHAR(10),
+	cat VARCHAR(20),
+	subcat VARCHAR(30),
+	maintenance VARCHAR(5),
+	dwh_create_date TIMESTAMP DEFAULT NOW()
+);
+DROP TABLE IF EXISTS silver.erp_loc_a101;
+CREATE TABLE silver.erp_loc_a101(
+	cid	VARCHAR(20),
+	cntry VARCHAR(20),
+	dwh_create_date TIMESTAMP DEFAULT NOW()
+);
+
+```
+**Clean crm_cust_info
+
+A Primary Kry must be unique and not NULL
+```sql
+--Check for NULLs or Duplicates in Primary Key
+--Expectations: No Result
+
+SELECT 
+	cst_id,
+	COUNT(*)
+FROM bronze.crm_cust_info
+GROUP BY cst_id
+HAVING COUNT(*) > 1 OR cst_id IS NULL;
+
+--Create row_number to remove duplicates
+SELECT *
+FROM(
+SELECT *,
+	ROW_NUMBER() OVER(PARTITION BY cst_id ORDER BY cst_create_date DESC) as flag_last
+	FROM bronze.crm_cust_info
+)f
+WHERE flag_last != 1;
+```
+Check unwanted spaces in string values
+``sql
+--Check for unwanted spaces
+--Expectations: No Result
+
+SELECT cst_firstname
+FROM bronze.crm_cust_info
+WHERE cst_firstname != TRIM(cst_firstname);
+
+SELECT cst_lastname
+FROM bronze.crm_cust_info
+WHERE cst_lastname != TRIM(cst_lastname);
+
+SELECT cst_gndr
+FROM bronze.crm_cust_info
+WHERE cst_gndr != TRIM(cst_gndr); --Quality of gender is good as it does not have any unwanted spaces
+
+```
+Check the consistency of values in low cardinality columns
+```sql
+--Data Consistency & Standardization
+SELECT 
+	DISTINCT cst_gndr
+FROM bronze.crm_cust_info;
+
+SELECT 
+	DISTINCT cst_marital_status
+FROM bronze.crm_cust_info;
+
+--In this data warehouse, I aim to store clear and meaningful values rather than using abbreviated terms and use the default value 'n/a' for missing values.
+
+
+```
+
+
 
 
 
