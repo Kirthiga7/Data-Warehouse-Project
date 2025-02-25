@@ -231,9 +231,9 @@ CREATE TABLE silver.erp_loc_a101(
 );
 
 ```
-**Clean crm_cust_info
+**Clean crm_cust_info**
 
-A Primary Kry must be unique and not NULL
+A Primary Key must be unique and not NULL
 ```sql
 --Check for NULLs or Duplicates in Primary Key
 --Expectations: No Result
@@ -255,7 +255,7 @@ SELECT *,
 WHERE flag_last != 1;
 ```
 Check unwanted spaces in string values
-``sql
+```sql
 --Check for unwanted spaces
 --Expectations: No Result
 
