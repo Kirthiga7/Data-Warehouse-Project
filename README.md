@@ -153,6 +153,13 @@ CREATE TABLE bronze.erp_loc_a101(
 
 ![image](https://github.com/user-attachments/assets/9bb6a3f9-1dbb-44db-a5e7-d2a28a631384)
 
+# Silver Layer
+![image](https://github.com/user-attachments/assets/756c1d2a-a1f4-4c10-a210-e42eae65f5a4)
+
+**Explore and Understand Data**
+
+
+
 
 
 
