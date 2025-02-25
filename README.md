@@ -67,6 +67,6 @@ All names must start with the source system name, and table names must match the
 
 Example: crm_customer_info → Customer information from the CRM system.
 
-
+**Creating Database and Schema**
 
 
