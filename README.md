@@ -38,6 +38,7 @@ Data Architecture is the blueprint that defines how data is collected, stored, p
 It ensures data is organized, secure, and accessible for analytics, decision-making, and operational processes.
 
 Type: Data Warehouse
+
 Approach: Medallion Architecture
 
 **Design the layers**
