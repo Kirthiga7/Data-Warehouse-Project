@@ -66,7 +66,7 @@ All names must start with the source system name, and table names must match the
 
 Example: crm_customer_info → Customer information from the CRM system.
 
-#Creating Database and Schemas
+# Creating Database and Schemas
 
 ```sql
 --Create Database
@@ -77,15 +77,15 @@ CREATE DATABASE DataWarehouse
 CREATE SCHEMA BRONZE;
 CREATE SCHEMA SILVER;
 CREATE SCHEMA GOLD;
-'''
-#Bronze Layer
+```
+# Bronze Layer
 ![image](https://github.com/user-attachments/assets/ff53aaaf-3e29-416b-9544-9dfcdb0a71bf)
 
 **Create DDL for Tables**
 
 Data Definition Language defines the structure of database tables
 
-'''sql
+```sql
 DROP TABLE IF EXISTS bronze.crm_cust_info;
 CREATE TABLE bronze.crm_cust_info(
 	cst_id INT,
@@ -143,7 +143,9 @@ CREATE TABLE bronze.erp_loc_a101(
 	cntry VARCHAR(20)
 );
 
-'''
+```
+
+
 **Import data from CSV files to respective Table**
 
 
