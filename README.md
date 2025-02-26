@@ -448,13 +448,274 @@ WHERE prd_end_dt < prd_start_dt; --No Result
 
 SELECT * FROM silver.crm_prd_info;
 ```
+**Clean & Load crm_ales_details**
+Check for unwanted spaces
+```sql
+SELECT *
+FROM bronze.crm_sales_details
+WHERE sls_ord_num != TRIM(sls_ord_num);
+```
+Checking foreignkey is in another table
+SELECT *
+FROM bronze.crm_sales_details
+WHERE sls_cust_id NOT IN(SELECT cst_id FROM silver.crm_cust_info); --No Result
 
+SELECT *
+FROM bronze.crm_sales_details
+WHERE sls_prd_key NOT IN(SELECT prd_key FROM silver.crm_prd_info); --No Result
+--So we can connect sales with customer and product table
+```
+Check for invalid date. Negative numbers or zeros can't be cast to a date
+```sql
+SELECT *
+FROM bronze.crm_sales_details
+WHERE sls_order_dt <= 0;
 
+/*	Replace 0 with NULL
+	The length of date must be 8. If not, change it to NULL
+ 	CAST the type to DATE     		*/
 
+CASE WHEN sls_order_dt = 0 OR LENGTH(sls_order_dt::TEXT) != 8 THEN NULL
+     ELSE CAST(CAST(sls_order_dt AS VARCHAR) AS DATE)
+END AS sls_order_dt;
 
+CASE WHEN sls_ship_dt = 0 OR LENGTH(sls_ship_dt::TEXT) != 8 THEN NULL
+     ELSE CAST(CAST(sls_ship_dt AS VARCHAR) AS DATE)
+END AS sls_ship_dt;
 
+CASE WHEN sls_due_dt = 0 OR LENGTH(sls_due_dt::TEXT) != 8 THEN NULL
+     ELSE CAST(CAST(sls_due_dt AS VARCHAR) AS DATE)
+END AS sls_due_dt;
 
+Order date must always be earlier than shipping date or due date
+```sql
+SELECT *
+FROM bronze.crm_sales_details
+WHERE sls_order_dt > sls_ship_dt	
+OR  sls_order_dt > sls_due_dt; --No Result
+```
+Business Rules:
 
+Sales = Quamtity * Price . Sales can't be negative, zeros or NULLs
+```sql
+SELECT
+	sls_sales,
+	sls_quantity,
+	sls_price
+FROM bronze.crm_sales_details
+WHERE sls_sales != sls_quantity * sls_price
+OR sls_sales <=0 OR sls_quantity <=0 OR sls_price <= 0
+OR sls_sales IS NULL OR sls_quantity IS NULL OR sls_price IS NULL
+ORDER BY sls_sales, sls_quantity, sls_price;
 
+/*	If Sales is negative, zero, or null derive it using Quantity and Price
+	If Price is zero or negative, calculate it using Sales and Quantity
+	If Price is negative, convert it to positive value		 */
 
+SELECT
+	sls_sales AS old_sls_sales,
+	sls_quantity ,
+	sls_price AS old_sls_price,
+        CASE WHEN sls_sales IS NULL OR sls_sales <= 0 OR sls_sales != sls_quantity * ABS(sls_price)
+	     		THEN sls_quantity * ABS(sls_price)
+             ELSE sls_sales
+	END AS sls_sales,
+        sls_quantity,
+	CASE WHEN sls_price IS NULL OR sls_price <= 0
+		 THEN sls_sales / NULLIF(sls_quantity,0)
+	ELSE sls_price
+	END AS sls_price
+FROM bronze.crm_sales_details
+WHERE sls_sales != sls_quantity * sls_price
+OR sls_sales <=0 OR sls_quantity <=0 OR sls_price <= 0
+OR sls_sales IS NULL OR sls_quantity IS NULL OR sls_price IS NULL
+ORDER BY sls_sales, sls_quantity, sls_price;
+```
 
+Load the updated data
+```sql
+INSERT INTO silver.crm_sales_details
+(sls_ord_num, sls_prd_key, sls_cust_id,sls_order_dt, sls_ship_dt, sls_due_dt, sls_sales, sls_quantity, sls_price)
+SELECT
+	sls_ord_num	,
+	sls_prd_key ,
+	sls_cust_id	,
+	CASE WHEN sls_order_dt = 0 OR LENGTH(sls_order_dt::TEXT) != 8 THEN NULL
+	     ELSE CAST(CAST(sls_order_dt AS VARCHAR) AS DATE)
+	END AS sls_order_dt,
+	CASE WHEN sls_ship_dt = 0 OR LENGTH(sls_ship_dt::TEXT) != 8 THEN NULL
+	     ELSE CAST(CAST(sls_ship_dt AS VARCHAR) AS DATE)
+	END AS sls_ship_dt,
+	CASE WHEN sls_due_dt = 0 OR LENGTH(sls_due_dt::TEXT) != 8 THEN NULL
+	     ELSE CAST(CAST(sls_due_dt AS VARCHAR) AS DATE)
+	END AS sls_due_dt,
+	CASE WHEN sls_sales IS NULL OR sls_sales <= 0 OR sls_sales != sls_quantity * ABS(sls_price)
+	     THEN sls_quantity * ABS(sls_price)
+	ELSE sls_sales
+	END AS sls_sales,
+	sls_quantity,
+	CASE WHEN sls_price IS NULL OR sls_price <= 0
+		 THEN sls_sales / NULLIF(sls_quantity,0)
+	ELSE sls_price
+	END AS sls_price
+FROM bronze.crm_sales_details;
+```
+Quality Check
+```sql
+SELECT
+	sls_sales,
+	sls_quantity,
+	sls_price
+FROM silver.crm_sales_details
+WHERE sls_sales != sls_quantity * sls_price
+OR sls_sales <=0 OR sls_quantity <=0 OR sls_price <= 0
+OR sls_sales IS NULL OR sls_quantity IS NULL OR sls_price IS NULL
+ORDER BY sls_sales, sls_quantity, sls_price;   --No Result!
+
+SELECT * FROM silver.crm_sales_details
+```
+**Clean & Load erp_cust_az12**
+```sql
+SELECT *
+FROM bronze.erp_cust_az12;
+```
+cid has character 'NAS' in starting, which is not in cst_key of customer tabl e(ctm_cust_info) . So remove the characters 
+```sql
+CASE WHEN cid LIKE 'NAS%' THEN SUBSTRING(cid,4,LENGTH(cid))
+     ELSE cid
+END AS cid;
+```
+--Identify out of range date
+```sql
+SELECT DISTINCT bdate
+FROM bronze.erp_cust_az12
+WHERE bdate < '1924-01-01' OR bdate > NOW();
+
+--Remove the birthdays in the future
+CASE WHEN bdate > NOW() THEN NULL
+     ELSE bdate
+END AS bdate;
+```
+--Data standardization & consistency
+SELECT 
+	DISTINCT gen,
+	CASE WHEN UPPER(TRIM(gen)) IN ('F','FEMALE') THEN 'Female'
+	     WHEN UPPER(TRIM(gen)) IN ('M','MALE') THEN 'Male'
+	     ELSE 'n/a'
+	END AS gen
+FROM bronze.erp_cust_az12;
+```
+Load the updated data
+```sql
+INSERT INTO silver.erp_cust_az12(cid, bdate, gen)
+SELECT 
+	CASE WHEN cid LIKE 'NAS%' THEN SUBSTRING(cid,4,LENGTH(cid))
+	     ELSE cid
+	END AS cid,
+	CASE WHEN bdate > NOW() THEN NULL
+		 ELSE bdate
+	END AS bdate,
+	CASE WHEN UPPER(TRIM(gen)) IN ('F','FEMALE') THEN 'Female'
+		 WHEN UPPER(TRIM(gen)) IN ('M','MALE') THEN 'Male'
+	ELSE 'n/a'
+	END AS gen
+FROM bronze.erp_cust_az12;
+```
+Quality Check
+```sql
+SELECT DISTINCT bdate
+FROM silver.erp_cust_az12
+WHERE bdate > NOW(); --No Result
+
+SELECT DISTINCT gen
+FROM silver.erp_cust_az12; --Clean Values
+
+SELECT DISTINCT cid
+FROM silver.erp_cust_az12
+WHERE cid NOT IN (SELECT cst_key FROM silver.crm_cust_info ) --No Result
+
+SELECT * FROM silver.erp_cust_az12;
+```
+
+**Clean & Load erp_loc_a101**
+```sql
+SELECT * FROM  bronze.erp_loc_a101;
+```
+cid → Uses a hyphen (-) between parts.
+
+But cst_key in customer table doesn't have anything in between. So remove the hyphen
+```sql
+REPLACE(cid,'-','')	cid;
+
+--Data standardization & consistency
+SELECT DISTINCT cntry FROM silver.erp_cust_az12;
+
+--To make it more standardized
+SELECT
+	DISTINCT cntry AS old_cnty,
+	CASE WHEN TRIM(cntry) = 'DE' THEN 'Germany'
+		 WHEN TRIM(cntry) IN ('US','USA') THEN 'United States'
+		 WHEN TRIM(cntry) = '' OR cntry IS NULL THEN 'n/a'
+	ELSE TRIM(cntry)
+	END AS cntry
+FROM bronze.erp_loc_a101;
+```
+Load the updated date
+```sql
+INSERT INTO silver.erp_loc_a101(cid, cntry)
+SELECT
+	REPLACE(cid,'-','')	cid,
+	CASE WHEN TRIM(cntry) = 'DE' THEN 'Germany'
+		 WHEN TRIM(cntry) IN ('US','USA') THEN 'United States'
+		 WHEN TRIM(cntry) = '' OR cntry IS NULL THEN 'n/a'
+	ELSE TRIM(cntry)
+	END AS cntry
+FROM bronze.erp_loc_a101;
+```
+QUALITY CHECK
+```sql
+SELECT DISTINCT cntry 
+FROM silver.erp_loc_a101; --Clean values
+	
+SELECT DISTINCT cid
+FROM silver.erp_loc_a101
+WHERE cid NOT IN (SELECT cst_key FROM silver.crm_cust_info ); --No Result
+```
+**Clean & Load erp_px_cat_g1v2**
+Check for NULL values
+```sql
+SELECT 
+	id,
+	COUNT(*)
+FROM bronze.erp_px_cat_g1v2
+GROUP BY id
+HAVING COUNT(*) > 1;  --No Result
+```
+Check for unwanted space
+```sql
+SELECT * FROM bronze.erp_px_cat_g1v2
+WHERE cat != TRIM(cat) OR subcat != TRIM(subcat) OR maintenance != TRIM(maintenance);  --No Result
+```
+Data standardization
+```sql
+SELECT DISTINCT cat
+FROM bronze.erp_px_cat_g1v2; --Good Data
+
+SELECT DISTINCT subcat
+FROM bronze.erp_px_cat_g1v2; --Good Data
+
+SELECT DISTINCT maintenance
+FROM bronze.erp_px_cat_g1v2;  --Good Data
+```
+This table has very good data. So there is no need for transformation.
+
+Load the data
+```sql
+INSERT INTO silver.erp_px_cat_g1v2(id,cat,subcat,maintenance)
+SELECT
+	id,
+	cat,
+	subcat,
+	maintenance 
+FROM bronze.erp_px_cat_g1v2;
+```
