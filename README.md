@@ -254,7 +254,8 @@ SELECT *,
 )f
 WHERE flag_last != 1;
 ```
-Check unwanted spaces in string values
+Check unwanted spaces in string values.
+
 Remove unnecessary spaces to ensure data consistency, and uniformity across all records.
 ```sql
 --Check for unwanted spaces
@@ -291,9 +292,9 @@ FROM bronze.crm_cust_info;
 --use the default value 'n/a' for missing values.
 --Using CASE statement to make the data more meaningful
 CASE WHEN UPPER(TRIM(cst_marital_status)) = 'S' THEN 'Single'
-	     WHEN UPPER(TRIM(cst_marital_status)) = 'M' THEN 'Married'
-     	     ELSE 'n/a'
-	END  cst_marital_status;
+     WHEN UPPER(TRIM(cst_marital_status)) = 'M' THEN 'Married'
+     ELSE 'n/a'
+END  cst_marital_status;
 CASE WHEN UPPER(TRIM(cst_gndr)) = 'F' THEN 'Female'
      WHEN UPPER(TRIM(cst_gndr)) = 'M' THEN 'Male'
      ELSE 'n/a'
@@ -359,7 +360,9 @@ GROUP BY prd_id
 HAVING COUNT(*) > 1 OR prd_id IS NULL;  --No Result
 ```
 prd_key → First five characters represent cat_id in erp_px_cat_g1v2
+
 ERP Table → Uses an underscore (_) between parts.
+
 CRM Table → Uses a hyphen (-) between parts.
 
 prd_key - after five characters represent prd_key in crm_sales_details table
@@ -388,6 +391,7 @@ SELECT DISTINCT prd_line
 FROM bronze.crm_prd_info;
 
 --Using CASE statement to make the data more meaningful
+
 CASE UPPER(TRIM(prd_line))
 	WHEN 'M' THEN 'Mountain'
 	WHEN 'R' THEN 'Road'
@@ -402,9 +406,10 @@ Check for Invalid Date Orders
 SELECT *
 FROM bronze.crm_prd_info
 WHERE prd_end_dt < prd_start_dt;
---Start date and end date are overlapping
---I derive the end date of current record from the start date of next record
---End Date = Start Date of the NEXT Record - 1
+
+/*  	Start date and end date are overlapping
+	I derive the end date of current record from the start date of next record
+	End Date = Start Date of the NEXT Record - 1      	*/
 LEAD(prd_start_dt) OVER (PARTITION BY prd_key ORDER BY prd_start_dt)-1 AS prd_end_dt;
 ```
 Load the updated data
