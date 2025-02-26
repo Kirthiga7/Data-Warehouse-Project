@@ -288,13 +288,15 @@ SELECT
 	DISTINCT cst_marital_status
 FROM bronze.crm_cust_info;
 
---In this data warehouse, I aim to store clear and meaningful values rather than using abbreviated terms and
---use the default value 'n/a' for missing values.
---Using CASE statement to make the data more meaningful
+/* 	In this data warehouse, I aim to store clear and meaningful values rather than using abbreviated terms and
+	use the default value 'n/a' for missing values.
+	Using CASE statement to make the data more meaningful	 */
+
 CASE WHEN UPPER(TRIM(cst_marital_status)) = 'S' THEN 'Single'
      WHEN UPPER(TRIM(cst_marital_status)) = 'M' THEN 'Married'
      ELSE 'n/a'
 END  cst_marital_status;
+
 CASE WHEN UPPER(TRIM(cst_gndr)) = 'F' THEN 'Female'
      WHEN UPPER(TRIM(cst_gndr)) = 'M' THEN 'Male'
      ELSE 'n/a'
@@ -410,6 +412,7 @@ WHERE prd_end_dt < prd_start_dt;
 /*  	Start date and end date are overlapping
 	I derive the end date of current record from the start date of next record
 	End Date = Start Date of the NEXT Record - 1      	*/
+
 LEAD(prd_start_dt) OVER (PARTITION BY prd_key ORDER BY prd_start_dt)-1 AS prd_end_dt;
 ```
 Load the updated data
@@ -719,3 +722,23 @@ SELECT
 	maintenance 
 FROM bronze.erp_px_cat_g1v2;
 ```
+# GOLD LAYER
+![image](https://github.com/user-attachments/assets/1332d0ff-d0fc-4f07-903a-225bd897d10b)
+
+**Data Modeling**
+A data model defines how data is structured, stored, and related within a database. It provides a blueprint for organizing data efficiently.
+Type: Physical Data Model
+**Dimensional Modeling**
+Dimensional modeling is a technique used in data warehousing to structure data for fast retrieval and easy reporting. 
+
+It organizes data into facts and dimensions, making it optimized for OLAP (Online Analytical Processing).
+Type: Star Schema
+
+Dimensions - Descriptive information that give context to the data. It answers Who? What? Where? Ex: Product Details
+
+Facts- Quantitative information that represents events. It answers How much? How many? . It have
+- Multiple IDs 
+- Date information
+- Measures & Numbers
+
+**Create Dimension Customers
