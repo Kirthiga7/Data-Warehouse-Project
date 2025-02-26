@@ -101,7 +101,6 @@ CREATE TABLE bronze.crm_cust_info(
 DROP TABLE IF EXISTS bronze.crm_prd_info;
 CREATE TABLE bronze.crm_prd_info(
 	prd_id 	INT,
-	cat_id VARCHAR(50),
 	prd_key	VARCHAR(50),
 	prd_nm	VARCHAR(50),
 	prd_cost INT,
@@ -290,7 +289,7 @@ FROM bronze.crm_cust_info;
 
 --In this data warehouse, I aim to store clear and meaningful values rather than using abbreviated terms and
 --use the default value 'n/a' for missing values.
---Use CASE statement to make the data more meaningful
+--Using CASE statement to make the data more meaningful
 CASE WHEN UPPER(TRIM(cst_marital_status)) = 'S' THEN 'Single'
 	     WHEN UPPER(TRIM(cst_marital_status)) = 'M' THEN 'Married'
      	     ELSE 'n/a'
@@ -350,11 +349,100 @@ SELECT * FROM silver.crm_cust_info
 
 **Clean & Load crm_prd_info**
 
+--Check primary key is don't have duplicate and NULL values
+```sql
+SELECT 
+	prd_id,
+	COUNT(*)
+FROM bronze.crm_prd_info
+GROUP BY prd_id
+HAVING COUNT(*) > 1 OR prd_id IS NULL;  --No Result
+```
+prd_key → First five characters represent cat_id in erp_px_cat_g1v2
+ERP Table → Uses an underscore (_) between parts.
+CRM Table → Uses a hyphen (-) between parts.
 
+prd_key - after five characters represent prd_key in crm_sales_details table
+```sql
+REPLACE(SUBSTRING(prd_key,1,5),'-','_') AS cat_id;
+SUBSTRING(prd_key,7,LENGTH(prd_key)) AS prd_key;
+```
+CHECK FOR UNWANTED SPACES
+```sql
+SELECT prd_nm
+FROM bronze.crm_prd_info
+WHERE prd_nm != TRIM(prd_nm); -=-No Result
+```
+Check for nulls or negative numbers
+```sql
+SELECT prd_cost
+FROM bronze.crm_prd_info
+WHERE prd_cost < 0 or prd_cost IS NULL;
 
+--Replace null with zero
+COALESCE(prd_cost,0) AS prd_cost;
+```
+Data Standardization and consistency
+```sql
+SELECT DISTINCT prd_line
+FROM bronze.crm_prd_info;
 
+--Using CASE statement to make the data more meaningful
+CASE UPPER(TRIM(prd_line))
+	WHEN 'M' THEN 'Mountain'
+	WHEN 'R' THEN 'Road'
+	WHEN 'S' THEN 'Other Sales'
+	WHEN 'T' THEN 'Touring'
+	ELSE 'n/a'
+END AS prd_line;
+```
+Check for Invalid Date Orders
+```sql
+--End date must not be earlier than the start date
+SELECT *
+FROM bronze.crm_prd_info
+WHERE prd_end_dt < prd_start_dt;
+--Start date and end date are overlapping
+--I derive the end date of current record from the start date of next record
+--End Date = Start Date of the NEXT Record - 1
+LEAD(prd_start_dt) OVER (PARTITION BY prd_key ORDER BY prd_start_dt)-1 AS prd_end_dt;
+```
+Load the updated data
+```sql
+INSERT INTO silver.crm_prd_info
+(prd_id, cat_id, prd_key, prd_nm, prd_cost, prd_line, prd_start_dt, prd_end_dt)
+SELECT
+        prd_id,
+	REPLACE(SUBSTRING(prd_key,1,5),'-','_') AS cat_id,
+	SUBSTRING(prd_key,7,LENGTH(prd_key)) AS prd_key,
+	prd_nm,
+	COALESCE(prd_cost,0) AS prd_cost,
+	CASE UPPER(TRIM(prd_line))
+		 WHEN 'M' THEN 'Mountain'
+	         WHEN 'R' THEN 'Road'
+		 WHEN 'S' THEN 'Other Sales'
+		 WHEN 'T' THEN 'Touring'
+	         ELSE 'n/a'	 
+	END AS prd_line,
+	prd_start_dt,
+	LEAD(prd_start_dt) OVER (PARTITION BY prd_key ORDER BY prd_start_dt)-1 AS prd_end_dt
+FROM bronze.crm_prd_info;
+```
+Quality check
+```sql
+SELECT prd_cost
+FROM silver.crm_prd_info
+WHERE prd_cost < 0 or prd_cost IS NULL; --No Result
 
+SELECT DISTINCT prd_line
+FROM silver.crm_prd_info; --No Result
 
+SELECT *
+FROM silver.crm_prd_info
+WHERE prd_end_dt < prd_start_dt; --No Result
+
+SELECT * FROM silver.crm_prd_info;
+```
 
 
 
