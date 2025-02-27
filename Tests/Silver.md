@@ -30,3 +30,19 @@ SELECT
 	DISTINCT cst_gndr
 FROM silver.crm_cust_info; --Clean Data
 ```
+#
+Quality check
+```sql
+SELECT prd_cost
+FROM silver.crm_prd_info
+WHERE prd_cost < 0 or prd_cost IS NULL; --No Result
+
+SELECT DISTINCT prd_line
+FROM silver.crm_prd_info; --No Result
+
+SELECT *
+FROM silver.crm_prd_info
+WHERE prd_end_dt < prd_start_dt; --No Result
+
+SELECT * FROM silver.crm_prd_info;
+```
