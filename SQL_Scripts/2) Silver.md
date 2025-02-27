@@ -257,14 +257,15 @@ SELECT
 FROM bronze.crm_prd_info;
 ```
 
-**Clean & Load crm_ales_details**
-Check for unwanted spaces
+# Clean & Load crm_sales_details**
+**Check for unwanted spaces**
 ```sql
 SELECT *
 FROM bronze.crm_sales_details
 WHERE sls_ord_num != TRIM(sls_ord_num);
 ```
-Checking foreignkey is in another table
+**Checking foreignkey is in another table**
+```sql
 SELECT *
 FROM bronze.crm_sales_details
 WHERE sls_cust_id NOT IN(SELECT cst_id FROM silver.crm_cust_info); --No Result
@@ -274,7 +275,9 @@ FROM bronze.crm_sales_details
 WHERE sls_prd_key NOT IN(SELECT prd_key FROM silver.crm_prd_info); --No Result
 --So we can connect sales with customer and product table
 ```
-Check for invalid date. Negative numbers or zeros can't be cast to a date
+**Check for invalid date**
+
+Negative numbers or zeros can't be cast to a date
 ```sql
 SELECT *
 FROM bronze.crm_sales_details
@@ -295,7 +298,7 @@ END AS sls_ship_dt;
 CASE WHEN sls_due_dt = 0 OR LENGTH(sls_due_dt::TEXT) != 8 THEN NULL
      ELSE CAST(CAST(sls_due_dt AS VARCHAR) AS DATE)
 END AS sls_due_dt;
-
+```
 Order date must always be earlier than shipping date or due date
 ```sql
 SELECT *
@@ -305,7 +308,9 @@ OR  sls_order_dt > sls_due_dt; --No Result
 ```
 Business Rules:
 
-Sales = Quamtity * Price . Sales can't be negative, zeros or NULLs
+Sales = Quamtity * Price .
+
+Sales can't be negative, zeros or NULLs
 ```sql
 SELECT
 	sls_sales,
@@ -340,8 +345,7 @@ OR sls_sales <=0 OR sls_quantity <=0 OR sls_price <= 0
 OR sls_sales IS NULL OR sls_quantity IS NULL OR sls_price IS NULL
 ORDER BY sls_sales, sls_quantity, sls_price;
 ```
-
-Load the updated data
+**Load the updated data**
 ```sql
 INSERT INTO silver.crm_sales_details
 (sls_ord_num, sls_prd_key, sls_cust_id,sls_order_dt, sls_ship_dt, sls_due_dt, sls_sales, sls_quantity, sls_price)
@@ -369,21 +373,7 @@ SELECT
 	END AS sls_price
 FROM bronze.crm_sales_details;
 ```
-Quality Check
-```sql
-SELECT
-	sls_sales,
-	sls_quantity,
-	sls_price
-FROM silver.crm_sales_details
-WHERE sls_sales != sls_quantity * sls_price
-OR sls_sales <=0 OR sls_quantity <=0 OR sls_price <= 0
-OR sls_sales IS NULL OR sls_quantity IS NULL OR sls_price IS NULL
-ORDER BY sls_sales, sls_quantity, sls_price;   --No Result!
-
-SELECT * FROM silver.crm_sales_details
-```
-**Clean & Load erp_cust_az12**
+# Clean & Load erp_cust_az12
 ```sql
 SELECT *
 FROM bronze.erp_cust_az12;
