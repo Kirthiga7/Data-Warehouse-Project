@@ -95,4 +95,13 @@ FROM silver.erp_cust_az12
 WHERE cid NOT IN (SELECT cst_key FROM silver.crm_cust_info ) --No Result
 ```
 # silver.erp_loc_a101 Table
-
+**Check Data Consistency**
+```sql
+SELECT DISTINCT cntry 
+FROM silver.erp_loc_a101; --Clean values
+	
+SELECT DISTINCT cid
+FROM silver.erp_loc_a101
+WHERE cid NOT IN (SELECT cst_key FROM silver.crm_cust_info ); --No Result
+```
+# erp_px_cat_g1v2 Table
