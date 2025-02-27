@@ -191,7 +191,7 @@ prd_key - after five characters represent prd_key in crm_sales_details table
 ```sql
 SUBSTRING(prd_key,7,LENGTH(prd_key)) AS prd_key;
 ```
-**CHECK FOR UNWANTED SPACES**
+**Check for unwanted spaces**
 ```sql
 SELECT prd_nm
 FROM bronze.crm_prd_info
