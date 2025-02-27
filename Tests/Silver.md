@@ -57,7 +57,7 @@ SELECT *
 FROM silver.crm_prd_info
 WHERE prd_end_dt < prd_start_dt; --No Result
 ```
-# crm_sales_details
+# crm_sales_details Table
 **Check Data Consistency: Sales = Quantity * Price**
 ```sql
 SELECT
@@ -78,3 +78,4 @@ FROM silver.crm_sales_details
 WHERE sls_order_dt > sls_ship_dt 
    OR sls_order_dt > sls_due_dt;
 ```
+# erp_cust_az12 Table
