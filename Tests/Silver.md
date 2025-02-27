@@ -38,7 +38,7 @@ SELECT
     COUNT(*) 
 FROM silver.crm_prd_info
 GROUP BY prd_id
-HAVING COUNT(*) > 1 OR prd_id IS NULL;
+HAVING COUNT(*) > 1 OR prd_id IS NULL; --No Result
 ```
 **Check for NULLs or Negative Values in Cost**
 ```sql
