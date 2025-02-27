@@ -458,7 +458,7 @@ SELECT
 FROM bronze.erp_loc_a101;
 ```
 # Clean & Load erp_px_cat_g1v2
-Check for NULL values
+**Check for NULL values**
 ```sql
 SELECT 
 	id,
@@ -467,12 +467,12 @@ FROM bronze.erp_px_cat_g1v2
 GROUP BY id
 HAVING COUNT(*) > 1;  --No Result
 ```
-Check for unwanted space
+**Check for unwanted space**
 ```sql
 SELECT * FROM bronze.erp_px_cat_g1v2
 WHERE cat != TRIM(cat) OR subcat != TRIM(subcat) OR maintenance != TRIM(maintenance);  --No Result
 ```
-Data standardization
+**Data standardization**
 ```sql
 SELECT DISTINCT cat
 FROM bronze.erp_px_cat_g1v2; --Good Data
@@ -485,7 +485,7 @@ FROM bronze.erp_px_cat_g1v2;  --Good Data
 ```
 This table has very good data. So there is no need for transformation.
 
-Load the data
+**Load the data**
 ```sql
 INSERT INTO silver.erp_px_cat_g1v2(id,cat,subcat,maintenance)
 SELECT
