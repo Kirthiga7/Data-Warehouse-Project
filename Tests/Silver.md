@@ -106,9 +106,11 @@ WHERE cid NOT IN (SELECT cst_key FROM silver.crm_cust_info ); --No Result
 ```
 # erp_px_cat_g1v2 Table
 **Check for Unwanted Spaces**
+```sql
 SELECT 
     * 
 FROM silver.erp_px_cat_g1v2
 WHERE cat != TRIM(cat) 
    OR subcat != TRIM(subcat) 
    OR maintenance != TRIM(maintenance); --No Result
+```
