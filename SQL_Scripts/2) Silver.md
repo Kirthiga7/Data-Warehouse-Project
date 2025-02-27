@@ -429,9 +429,10 @@ cid → Uses a hyphen (-) between parts.
 
 But cst_key in customer table doesn't have anything in between. So remove the hyphen
 ```sql
-REPLACE(cid,'-','')	cid;
-
---Data standardization & consistency
+REPLACE(cid,'-','') AS cid;
+```
+**Data standardization & consistency**
+```sql
 SELECT DISTINCT cntry FROM silver.erp_cust_az12;
 
 --To make it more standardized
@@ -444,11 +445,11 @@ SELECT
 	END AS cntry
 FROM bronze.erp_loc_a101;
 ```
-Load the updated date
+**Load the updated date**
 ```sql
 INSERT INTO silver.erp_loc_a101(cid, cntry)
 SELECT
-	REPLACE(cid,'-','')	cid,
+	REPLACE(cid,'-','') cid,
 	CASE WHEN TRIM(cntry) = 'DE' THEN 'Germany'
 		 WHEN TRIM(cntry) IN ('US','USA') THEN 'United States'
 		 WHEN TRIM(cntry) = '' OR cntry IS NULL THEN 'n/a'
@@ -456,16 +457,7 @@ SELECT
 	END AS cntry
 FROM bronze.erp_loc_a101;
 ```
-QUALITY CHECK
-```sql
-SELECT DISTINCT cntry 
-FROM silver.erp_loc_a101; --Clean values
-	
-SELECT DISTINCT cid
-FROM silver.erp_loc_a101
-WHERE cid NOT IN (SELECT cst_key FROM silver.crm_cust_info ); --No Result
-```
-**Clean & Load erp_px_cat_g1v2**
+# Clean & Load erp_px_cat_g1v2
 Check for NULL values
 ```sql
 SELECT 
