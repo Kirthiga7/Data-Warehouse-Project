@@ -5,6 +5,7 @@
 
 A data model defines how data is structured, stored, and related within a database. It provides a blueprint for organizing data efficiently.
 Type: Physical Data Model
+
 **Dimensional Modeling**
 
 Dimensional modeling is a technique used in data warehousing to structure data for fast retrieval and easy reporting. 
@@ -19,7 +20,7 @@ It organizes data into facts and dimensions, making it optimized for OLAP (Onlin
 - Date information
 - Measures & Numbers
 
-**Create Customer Dimension**
+# Create Customer Dimension
 
 For Customer Dimension, keep customer information table (crm_cust_info) as master table and join extra data about customer from 
 (erp_cust_az12) table and (erp_loc_a101) table.
@@ -54,7 +55,7 @@ SELECT cst_id, COUNT(*) FROM
 GROUP BY cst_id
 HAVING COUNT(*) >1; --No Result (No Duplicates)
 ```
-**DATA INTEGRATION**
+**Data Integration**
 
 Integrating Gender details from crm table and erp table.
 ```sql
@@ -97,7 +98,7 @@ ON ci.cst_key = la.cid;
 
 SELECT * FROM gold.dim_customers;
 ```
-**Create Product Dimension**
+# Create Product Dimension
 For Product Dimension, keep crm_prd_info as master table and join erp_px_cat_g1v2 table
 ```sql
 SELECT
@@ -116,7 +117,7 @@ LEFT JOIN silver.erp_px_cat_g1v2 pc
 ON pn.cat_id = pc.id
 where prd_end_dt IS NULL; --FILTER out all historical data (If end_date is NULL then it is current information of the product)
 ```
-Check Duplicates
+**Check Duplicates**
 ```SQL
 SELECT prd_key, COUNT(*)
 FROM(
@@ -128,11 +129,11 @@ FROM(
  GROUP BY prd_key
  HAVING COUNT(*) > 1; --No Result (No Duplicates)
 ```
-Rename columns to friendly, meaningful names.
+- Rename columns to friendly, meaningful names.
 
-Sort the columns into logical groups to improve readability.
+- Sort the columns into logical groups to improve readability.
 
-Create View as dimension product and generate Surrogate Key 
+- Create View as dimension product and generate Surrogate Key 
 ```sql
 CREATE VIEW gold.dim_products AS
 SELECT
@@ -152,10 +153,10 @@ LEFT JOIN silver.erp_px_cat_g1v2 pc
 ON pn.cat_id = pc.id
 where prd_end_dt IS NULL;
 ```
-**Create Sales Fact**
-Create Sales_Detail as Fact . Because it has multiple KEYS, DATES and MEASURES.
-Use the dimension's surrogate keys instead of IDs to connect facts with dimension easily.
-Give friendly name to columns and sort the columns into logical groups to improve readability.
+# Create Sales Fact
+- Create Sales_Detail as Fact . Because it has multiple KEYS, DATES and MEASURES.
+- Use the dimension's surrogate keys instead of IDs to connect facts with dimension easily.
+- Give friendly name to columns and sort the columns into logical groups to improve readability.
 ```sql
 CREATE VIEW gold.fact_sales AS
 SELECT
@@ -173,24 +174,4 @@ LEFT JOIN gold.dim_products pr
 ON sd.sls_prd_key = pr.product_number
 LEFT JOIN gold.dim_customers cu
 ON sd.sls_cust_id = cu.customer_id;
-
-SELECT * FROM gold.fact_sales;
-```
-Foreign Key Integrity(Dimensions)
-Check if all dimension tables can successfully join to the fact table
-```sql
-select * 
-from gold.fact_sales f
-LEFT JOIN gold.dim_customers c
-ON c.customer_key = f.customer_key
-WHERE c.customer_key is null; --No Result(Everything is matching perfectly)
-
-select * 
-from gold.fact_sales f
-LEFT JOIN gold.dim_customers c
-ON c.customer_key = f.customer_key
-LEFT JOIN gold.dim_products p
-ON p.product_key = f.product_key
-WHERE p.product_key is null;   --No Result(Everything is matching perfectly)
-```
 ```
