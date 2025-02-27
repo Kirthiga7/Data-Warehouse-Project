@@ -75,8 +75,6 @@ CREATE TABLE silver.erp_loc_a101(
 );
 
 ```
-
-
 # Clean crm_cust_info
 
 **A Primary Key must be unique and not NULL**
@@ -170,11 +168,9 @@ FROM(
 	WHERE cst_id IS NOT NULL
 )WHERE flag_last = 1; --Select the most recent record per customer
 ```
+# Clean & Load crm_prd_info
 
-
-**Clean & Load crm_prd_info**
-
---Check primary key is don't have duplicate and NULL values
+**Check primary key is don't have duplicate and NULL values**
 ```sql
 SELECT 
 	prd_id,
@@ -188,19 +184,20 @@ prd_key → First five characters represent cat_id in erp_px_cat_g1v2
 ERP Table → Uses an underscore (_) between parts.
 
 CRM Table → Uses a hyphen (-) between parts.
-
-prd_key - after five characters represent prd_key in crm_sales_details table
 ```sql
 REPLACE(SUBSTRING(prd_key,1,5),'-','_') AS cat_id;
+```
+prd_key - after five characters represent prd_key in crm_sales_details table
+```sql
 SUBSTRING(prd_key,7,LENGTH(prd_key)) AS prd_key;
 ```
-CHECK FOR UNWANTED SPACES
+**CHECK FOR UNWANTED SPACES**
 ```sql
 SELECT prd_nm
 FROM bronze.crm_prd_info
 WHERE prd_nm != TRIM(prd_nm); -=-No Result
 ```
-Check for nulls or negative numbers
+**Check for nulls or negative numbers**
 ```sql
 SELECT prd_cost
 FROM bronze.crm_prd_info
@@ -209,7 +206,7 @@ WHERE prd_cost < 0 or prd_cost IS NULL;
 --Replace null with zero
 COALESCE(prd_cost,0) AS prd_cost;
 ```
-Data Standardization and consistency
+**Data Standardization and consistency**
 ```sql
 SELECT DISTINCT prd_line
 FROM bronze.crm_prd_info;
@@ -224,9 +221,10 @@ CASE UPPER(TRIM(prd_line))
 	ELSE 'n/a'
 END AS prd_line;
 ```
-Check for Invalid Date Orders
+**Check for Invalid Date Orders**
+
+End date must not be earlier than the start date
 ```sql
---End date must not be earlier than the start date
 SELECT *
 FROM bronze.crm_prd_info
 WHERE prd_end_dt < prd_start_dt;
@@ -237,7 +235,7 @@ WHERE prd_end_dt < prd_start_dt;
 
 LEAD(prd_start_dt) OVER (PARTITION BY prd_key ORDER BY prd_start_dt)-1 AS prd_end_dt;
 ```
-Load the updated data
+**Load the updated data**
 ```sql
 INSERT INTO silver.crm_prd_info
 (prd_id, cat_id, prd_key, prd_nm, prd_cost, prd_line, prd_start_dt, prd_end_dt)
@@ -258,21 +256,7 @@ SELECT
 	LEAD(prd_start_dt) OVER (PARTITION BY prd_key ORDER BY prd_start_dt)-1 AS prd_end_dt
 FROM bronze.crm_prd_info;
 ```
-Quality check
-```sql
-SELECT prd_cost
-FROM silver.crm_prd_info
-WHERE prd_cost < 0 or prd_cost IS NULL; --No Result
 
-SELECT DISTINCT prd_line
-FROM silver.crm_prd_info; --No Result
-
-SELECT *
-FROM silver.crm_prd_info
-WHERE prd_end_dt < prd_start_dt; --No Result
-
-SELECT * FROM silver.crm_prd_info;
-```
 **Clean & Load crm_ales_details**
 Check for unwanted spaces
 ```sql
