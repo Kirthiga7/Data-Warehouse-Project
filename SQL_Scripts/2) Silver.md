@@ -384,18 +384,19 @@ CASE WHEN cid LIKE 'NAS%' THEN SUBSTRING(cid,4,LENGTH(cid))
      ELSE cid
 END AS cid;
 ```
---Identify out of range date
+**Identify out of range date**
 ```sql
 SELECT DISTINCT bdate
 FROM bronze.erp_cust_az12
 WHERE bdate < '1924-01-01' OR bdate > NOW();
 
---Remove the birthdays in the future
+--Remove the birthday is in the future
 CASE WHEN bdate > NOW() THEN NULL
      ELSE bdate
 END AS bdate;
 ```
---Data standardization & consistency
+**Data standardization & consistency**
+```sql
 SELECT 
 	DISTINCT gen,
 	CASE WHEN UPPER(TRIM(gen)) IN ('F','FEMALE') THEN 'Female'
@@ -404,7 +405,7 @@ SELECT
 	END AS gen
 FROM bronze.erp_cust_az12;
 ```
-Load the updated data
+**Load the updated data**
 ```sql
 INSERT INTO silver.erp_cust_az12(cid, bdate, gen)
 SELECT 
@@ -420,23 +421,7 @@ SELECT
 	END AS gen
 FROM bronze.erp_cust_az12;
 ```
-Quality Check
-```sql
-SELECT DISTINCT bdate
-FROM silver.erp_cust_az12
-WHERE bdate > NOW(); --No Result
-
-SELECT DISTINCT gen
-FROM silver.erp_cust_az12; --Clean Values
-
-SELECT DISTINCT cid
-FROM silver.erp_cust_az12
-WHERE cid NOT IN (SELECT cst_key FROM silver.crm_cust_info ) --No Result
-
-SELECT * FROM silver.erp_cust_az12;
-```
-
-**Clean & Load erp_loc_a101**
+# Clean & Load erp_loc_a101
 ```sql
 SELECT * FROM  bronze.erp_loc_a101;
 ```
