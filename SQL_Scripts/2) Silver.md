@@ -5,8 +5,6 @@
 
 Exploring all columns in every table and relationship between these tables
 
-
-
 **Metadata Columns:**
 Extra Columns added by data engineers that do not orginate from the source data.
 
@@ -18,14 +16,15 @@ Here I add create_date to track the record's load timestamp
 DROP TABLE IF EXISTS silver.crm_cust_info;
 CREATE TABLE silver.crm_cust_info(
 	cst_id INT,
-	cst_key	VARCHAR(20),
-	cst_firstname VARCHAR(20),
-	cst_lastname VARCHAR(30),
-	cst_marital_status VARCHAR(20),
-	cst_gndr VARCHAR(20),
+	cst_key	VARCHAR(50),
+	cst_firstname VARCHAR(50),
+	cst_lastname VARCHAR(50),
+	cst_marital_status VARCHAR(50),
+	cst_gndr VARCHAR(50),
 	cst_create_date DATE,
 	dwh_create_date TIMESTAMP DEFAULT NOW()
 );
+
 DROP TABLE IF EXISTS silver.crm_prd_info;
 CREATE TABLE silver.crm_prd_info(
 	prd_id 	INT,
@@ -38,13 +37,14 @@ CREATE TABLE silver.crm_prd_info(
 	prd_end_dt DATE,
 	dwh_create_date TIMESTAMP DEFAULT NOW()
 );
+
 DROP TABLE IF EXISTS silver.crm_sales_details;
 CREATE TABLE silver.crm_sales_details(
-	sls_ord_num	VARCHAR(50),
+	sls_ord_num VARCHAR(50),
 	sls_prd_key VARCHAR(50),
-	sls_cust_id	INT,
+	sls_cust_id INT,
 	sls_order_dt DATE,
-	sls_ship_dt	DATE,
+	sls_ship_dt DATE,
 	sls_due_dt DATE,
 	sls_sales INT,
 	sls_quantity INT,
@@ -54,35 +54,35 @@ CREATE TABLE silver.crm_sales_details(
 
 DROP TABLE IF EXISTS silver.erp_cust_az12;
 CREATE TABLE silver.erp_cust_az12(
-	CID VARCHAR(50),
-	BDATE DATE,
-	GEN VARCHAR(10),
+	cid VARCHAR(50),
+	bdate DATE,
+	gen VARCHAR(50),
 	dwh_create_date TIMESTAMP DEFAULT NOW()
 );
 DROP TABLE IF EXISTS silver.erp_px_cat_g1v2;
 CREATE TABLE silver.erp_px_cat_g1v2(
-	id VARCHAR(10),
-	cat VARCHAR(20),
-	subcat VARCHAR(30),
-	maintenance VARCHAR(5),
+	id VARCHAR(50),
+	cat VARCHAR(50),
+	subcat VARCHAR(50),
+	maintenance VARCHAR(50),
 	dwh_create_date TIMESTAMP DEFAULT NOW()
 );
 DROP TABLE IF EXISTS silver.erp_loc_a101;
 CREATE TABLE silver.erp_loc_a101(
-	cid	VARCHAR(20),
-	cntry VARCHAR(20),
+	cid VARCHAR(50),
+	cntry VARCHAR(50),
 	dwh_create_date TIMESTAMP DEFAULT NOW()
 );
 
 ```
-**Clean crm_cust_info**
 
-A Primary Key must be unique and not NULL
-Remove Duplicates: Ensure omly one record per entity by identifying and retaining the most relevant row
+
+# Clean crm_cust_info
+
+**A Primary Key must be unique and not NULL**
+
+Remove Duplicates: Ensure only one record per entity by identifying and retaining the most relevant row
 ```sql
---Check for NULLs or Duplicates in Primary Key
---Expectations: No Result
-
 SELECT 
 	cst_id,
 	COUNT(*)
@@ -90,7 +90,8 @@ FROM bronze.crm_cust_info
 GROUP BY cst_id
 HAVING COUNT(*) > 1 OR cst_id IS NULL;
 
---Create row_number to remove duplicates
+Create row_number to remove duplicates
+```sql
 SELECT *
 FROM(
 SELECT *,
@@ -99,13 +100,10 @@ SELECT *,
 )f
 WHERE flag_last != 1;
 ```
-Check unwanted spaces in string values.
+**Check unwanted spaces in string values.**
 
 Remove unnecessary spaces to ensure data consistency, and uniformity across all records.
 ```sql
---Check for unwanted spaces
---Expectations: No Result
-
 SELECT cst_firstname
 FROM bronze.crm_cust_info
 WHERE cst_firstname != TRIM(cst_firstname);
@@ -122,7 +120,7 @@ WHERE cst_gndr != TRIM(cst_gndr); --Quality of gender is good as it does not hav
 TRIM(cst_firstname) AS cst_firstname;
 TRIM(cst_lastname) AS cst_lastname;
 ```
-Check the consistency of values in low cardinality columns
+**Check the consistency of values in low cardinality columns**
 ```sql
 --Data Consistency & Standardization
 SELECT 
@@ -147,7 +145,7 @@ CASE WHEN UPPER(TRIM(cst_gndr)) = 'F' THEN 'Female'
      ELSE 'n/a'
 END cst_gndr;
 ```
-Load the updated data
+**Load the updated data**
 ```sql
 INSERT INTO silver.crm_cust_info
 (cst_id,cst_key,cst_firstname,cst_lastname,cst_marital_status,cst_gndr,cst_create_date)
