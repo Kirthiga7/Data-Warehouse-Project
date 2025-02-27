@@ -28,7 +28,7 @@ WHERE cst_firstname != TRIM(cst_firstname); --No Result
 ```sql
 SELECT 
 	DISTINCT cst_gndr
-FROM silver.crm_cust_info; --Clean Data
+FROM silver.crm_cust_info; --Clean Values
 ```
 # crm_prd_info Table
 **Check for NULLs or Duplicates in Primary Key**
@@ -79,3 +79,20 @@ WHERE sls_order_dt > sls_ship_dt
    OR sls_order_dt > sls_due_dt;
 ```
 # erp_cust_az12 Table
+**Identify Out-of-Range Dates**
+```sql
+SELECT DISTINCT bdate
+FROM silver.erp_cust_az12
+WHERE bdate > NOW(); --No Result
+```
+**Check Data Consistency**
+```sql
+SELECT DISTINCT gen
+FROM silver.erp_cust_az12; --Clean Values
+
+SELECT DISTINCT cid
+FROM silver.erp_cust_az12
+WHERE cid NOT IN (SELECT cst_key FROM silver.crm_cust_info ) --No Result
+```
+# silver.erp_loc_a101 Table
+
