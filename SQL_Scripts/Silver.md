@@ -5,8 +5,7 @@
 
 Exploring all columns in every table and relationship between these tables
 
-**INTEGRATION MODEL:**
-![image](https://github.com/user-attachments/assets/48132423-c0b4-4269-be05-af7aba3c090e)
+
 
 **Metadata Columns:**
 Extra Columns added by data engineers that do not orginate from the source data.
