@@ -55,9 +55,7 @@ Approach: Medallion Architecture
 
 ![image](https://github.com/user-attachments/assets/9f1c6eca-3685-4853-92e6-8b27d01d01c8) 
 
-**Diagram of the Architecture**
 
-![image](https://github.com/user-attachments/assets/0bbc85bd-7b5a-4f1e-8cdc-e89d82f29073)
 
 **Project Initialization**
 
