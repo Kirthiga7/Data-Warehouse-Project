@@ -2,24 +2,27 @@
 ![image](https://github.com/user-attachments/assets/1332d0ff-d0fc-4f07-903a-225bd897d10b)
 
 **Data Modeling**
+
 A data model defines how data is structured, stored, and related within a database. It provides a blueprint for organizing data efficiently.
 Type: Physical Data Model
 **Dimensional Modeling**
+
 Dimensional modeling is a technique used in data warehousing to structure data for fast retrieval and easy reporting. 
 
 It organizes data into facts and dimensions, making it optimized for OLAP (Online Analytical Processing).
-Type: Star Schema
+- Type: Star Schema
 
-Dimensions - Descriptive information that give context to the data. It answers Who? What? Where? Ex: Product Details
+**Dimensions**- Descriptive information that give context to the data. It answers Who? What? Where? Ex: Product Details
 
-Facts- Quantitative information that represents events. It answers How much? How many? . It have
+**Facts**- Quantitative information that represents events. It answers How much? How many? . It have
 - Multiple IDs 
 - Date information
 - Measures & Numbers
 
 **Create Customer Dimension**
+
 For Customer Dimension, keep customer information table (crm_cust_info) as master table and join extra data about customer from 
-extra customer information(erp_cust_az12) table and location of customer(erp_loc_a101) table.
+(erp_cust_az12) table and (erp_loc_a101) table.
 ```sql
 SELECT
 	ci.cst_id,
@@ -51,7 +54,8 @@ SELECT cst_id, COUNT(*) FROM
 GROUP BY cst_id
 HAVING COUNT(*) >1; --No Result (No Duplicates)
 ```
-DATA INTEGRATION
+**DATA INTEGRATION**
+
 Integrating Gender details from crm table and erp table.
 ```sql
 SELECT DISTINCT
@@ -65,11 +69,11 @@ LEFT JOIN silver.erp_cust_az12 ca
 ON ci.cst_key = ca.cid
 ORDER BY 1,2; 
 ```
-Rename columns to friendly, meaningful names.
+- Rename columns to friendly, meaningful names.
 
-Sort the columns into logical groups to improve readability.
+- Sort the columns into logical groups to improve readability.
 
-Create View as dimension customer and generate Surrogate Key 
+- Create View as dimension customer and generate Surrogate Key 
 ```sql
 CREATE VIEW gold.dim_customers AS
 SELECT 
@@ -92,11 +96,6 @@ LEFT JOIN silver.erp_loc_a101 la
 ON ci.cst_key = la.cid;
 
 SELECT * FROM gold.dim_customers;
-```
-Quality Check
-```sql
-SELECT DISTINCT gender
-FROM gold.dim_customers  --Clean Data
 ```
 **Create Product Dimension**
 For Product Dimension, keep crm_prd_info as master table and join erp_px_cat_g1v2 table
