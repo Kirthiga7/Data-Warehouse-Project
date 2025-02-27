@@ -76,16 +76,7 @@ Example: crm_customer_info → Customer information from the CRM system.
 
 # Creating Database and Schemas
 
-```sql
---Create Database
-DROP DATABASE IF EXISTS DataWarehouse
-CREATE DATABASE DataWarehouse
 
---Create Schema
-CREATE SCHEMA BRONZE;
-CREATE SCHEMA SILVER;
-CREATE SCHEMA GOLD;
-```
 Building the Data Warehouse (Data Engineering)
 Objective
 Develop a modern data warehouse using SQL Server to consolidate sales data, enabling analytical reporting and informed decision-making.
