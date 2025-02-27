@@ -19,7 +19,6 @@ CREATE SCHEMA SILVER;
 CREATE SCHEMA GOLD;
 ```
     
-**Project Initialization**
 
 **Naming Conventions**
  
