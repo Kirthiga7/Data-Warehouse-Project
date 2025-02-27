@@ -22,6 +22,7 @@ The Gold Layer is the business-level data representation, structured to support 
 **2. gold.dim_products**
 - Purpose: Provides information about the products and their attributes.
 - Columns:
+
 |Column Name	|Data Type|	Description|
 |:------------|:---------|:-----------|
 |product_key|	INT|	Surrogate key uniquely identifying each product record in the product dimension table.|
