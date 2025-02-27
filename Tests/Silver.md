@@ -8,7 +8,7 @@
     - Data standardization and consistency.
     - Invalid date ranges and orders.
     - Data consistency between related fields
-# crm_cust_info
+# crm_cust_info Table
 **Check for NULLs or Duplicates in Primary Key**
 ```sql
 SELECT 
