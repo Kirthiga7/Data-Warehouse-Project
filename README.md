@@ -20,10 +20,9 @@ It includes
 - Data Load
 - Data Modeling
 
-# ETL Processing
-![image](https://github.com/user-attachments/assets/d5ed9044-4efa-471f-a73f-c02bc133ef2b)
+**ETL Processing**
 
-**Extract (E)** : Data is retrieved from various sources like databases
+**Extract (E)** - Data is retrieved from various sources like databases
 - Method: Pull Extraction
 - Type: Full Extraction 
 - Technique: File Parsing
@@ -51,21 +50,20 @@ Type: Data Warehouse
 
 Approach: Medallion Architecture
 
-**Design the layers**
+**Layer Design**
 
 ![image](https://github.com/user-attachments/assets/9f1c6eca-3685-4853-92e6-8b27d01d01c8) 
 
+**Building the Data Warehouse** 
 
+Objective:
 
-
-
-Building the Data Warehouse (Data Engineering)
-Objective
 Develop a modern data warehouse using SQL Server to consolidate sales data, enabling analytical reporting and informed decision-making.
 
 Specifications
-Data Sources: Import data from two source systems (ERP and CRM) provided as CSV files.
-Data Quality: Cleanse and resolve data quality issues prior to analysis.
-Integration: Combine both sources into a single, user-friendly data model designed for analytical queries.
-Scope: Focus on the latest dataset only; historization of data is not required.
-Documentation: Provide clear documentation of the data model to support both business stakeholders and analytics teams.
+
+- Data Sources: Import data from two source systems (ERP and CRM) provided as CSV files.
+- Data Quality: Cleanse and resolve data quality issues prior to analysis.
+- Integration: Combine both sources into a single, user-friendly data model designed for analytical queries.
+- Scope: Focus on the latest dataset only; historization of data is not required.
+- Documentation: Provide clear documentation of the data model to support both business stakeholders and analytics teams.
