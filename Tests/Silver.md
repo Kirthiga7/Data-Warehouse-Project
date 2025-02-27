@@ -1,4 +1,4 @@
-# Quality Chec
+# Quality Check
 **Script Purpose:**
   
     This script performs various quality checks for data consistency, accuracy, 
