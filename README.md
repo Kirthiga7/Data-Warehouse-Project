@@ -14,7 +14,7 @@ This project involves:
 A subject-oriented, integrated, time-variant, and non-volatile collection of data in support of management's decision making process.
 
 
-![image](https://github.com/user-attachments/assets/bffac48b-f199-460c-98f5-bba8cf811115)
+![image](https://github.com/user-attachments/assets/31cd31a2-102a-4386-96a5-7a05ea1cf96c)
 
 
 **ETL Processing**
