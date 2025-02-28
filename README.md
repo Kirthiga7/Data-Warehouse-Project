@@ -12,13 +12,10 @@ This project involves:
 **Data Warehouse**
 
 A subject-oriented, integrated, time-variant, and non-volatile collection of data in support of management's decision making process.
-It includes
-- ETL Processing
-- Data Architecture
-- Data Integration
-- Data Cleansing
-- Data Load
-- Data Modeling
+
+
+![image](https://github.com/user-attachments/assets/bffac48b-f199-460c-98f5-bba8cf811115)
+
 
 **ETL Processing**
 
