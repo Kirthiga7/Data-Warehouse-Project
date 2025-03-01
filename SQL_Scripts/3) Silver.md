@@ -117,7 +117,7 @@ WHERE cst_gndr != TRIM(cst_gndr); --Quality of gender is good as it does not hav
 TRIM(cst_firstname) AS cst_firstname;
 TRIM(cst_lastname) AS cst_lastname;
 ```
-**Check the consistency of values in low cardinality columns**
+**Check the consistency of values in low cardinality columns (Dimension with few unique values)**
 ```sql
 --Data Consistency & Standardization
 SELECT 
